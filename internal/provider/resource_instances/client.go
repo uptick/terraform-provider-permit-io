@@ -39,6 +39,9 @@ func (c *resourceInstanceClient) Create(ctx context.Context, plan resourceInstan
 	if err != nil {
 		return resourceInstanceModel{}, err
 	}
+	if created == nil {
+		return resourceInstanceModel{}, fmt.Errorf("create returned nil response")
+	}
 
 	return tfModelFromResourceInstanceRead(*created), nil
 }
@@ -48,6 +51,9 @@ func (c *resourceInstanceClient) Read(ctx context.Context, key string, resource 
 	instance, err := c.client.Api.ResourceInstances.Get(ctx, instanceId)
 	if err != nil {
 		return resourceInstanceModel{}, err
+	}
+	if instance == nil {
+		return resourceInstanceModel{}, fmt.Errorf("instance %s not found", instanceId)
 	}
 
 	return tfModelFromResourceInstanceRead(*instance), nil
@@ -72,6 +78,9 @@ func (c *resourceInstanceClient) Update(ctx context.Context, plan resourceInstan
 	updated, err := c.client.Api.ResourceInstances.Update(ctx, instanceId, *instanceUpdate)
 	if err != nil {
 		return resourceInstanceModel{}, err
+	}
+	if updated == nil {
+		return resourceInstanceModel{}, fmt.Errorf("update returned nil response for %s", instanceId)
 	}
 
 	return tfModelFromResourceInstanceRead(*updated), nil

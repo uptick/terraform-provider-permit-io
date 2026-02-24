@@ -108,6 +108,10 @@ func (r *ResourceInstanceResource) Read(ctx context.Context, request resource.Re
 	instanceRead, err := r.client.Read(ctx, model.Key.ValueString(), model.Resource.ValueString())
 
 	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			response.State.RemoveResource(ctx)
+			return
+		}
 		response.Diagnostics.AddError(
 			"Unable to read resource instance",
 			fmt.Errorf("unable to read resource instance: %w", err).Error(),
